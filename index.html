@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management</title>
+    <style>
+        /* Background Styling */
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('https://source.unsplash.com/1600x900/?office,workplace') no-repeat center center/cover;
+            color: white;
+            text-align: center;
+        }
+        /* Container */
+        
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            width: 80%;
+            margin: auto;
+            margin-top: 50px;
+            border-radius: 10px;
+        }
+        
+        h1 {
+            color: #2518dd;
+        }
+        /* Input Fields */
+        
+        input {
+            width: 200px;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+        }
+        /* Buttons */
+        
+        button {
+            padding: 10px 20px;
+            background: #f8c471;
+            border: none;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        
+        button:hover {
+            background: #d68910;
+            color: white;
+        }
+        /* Table Styling */
+        
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background: white;
+            color: black;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        th,
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        
+        th {
+            background: #f8c471;
+        }
+    </style>
+
+    <script>
+        function fetchEmployees() {
+            fetch("http://127.0.0.1:5000/employees")
+                .then(response => response.json())
+                .then(data => {
+                    let table = "<tr><th>ID</th><th>Name</th><th>Age</th><th>Department</th></tr>";
+                    data.forEach(emp => {
+                        table += `<tr>
+                        <td>${emp.id}</td>
+                        <td>${emp.name}</td>
+                        <td>${emp.age}</td>
+                        <td>${emp.department}</td>
+                    </tr>`;
+                    });
+                    document.getElementById("employeeTable").innerHTML = table;
+                });
+        }
+
+        function addEmployee() {
+            const name = document.getElementById("name").value;
+            const age = document.getElementById("age").value;
+            const department = document.getElementById("department").value;
+
+            fetch("http://127.0.0.1:5000/employee", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name,
+                        age,
+                        department
+                    })
+                })
+                .then(response => response.json())
+                .then(() => {
+                    alert("Employee added!");
+                    fetchEmployees();
+                });
+        }
+
+        function deleteEmployee() {
+            const id = document.getElementById("deleteId").value;
+
+            fetch(`http://127.0.0.1:5000/employee/${id}`, {
+                    method: "DELETE"
+                })
+                .then(response => response.json())
+                .then(() => {
+                    alert("Employee deleted!");
+                    fetchEmployees();
+                });
+        }
+
+        function updateEmployee() {
+            const id = document.getElementById("updateId").value;
+            const name = document.getElementById("updateName").value;
+            const age = document.getElementById("updateAge").value;
+            const department = document.getElementById("updateDepartment").value;
+
+            fetch(`http://127.0.0.1:5000/employee/${id}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name,
+                        age,
+                        department
+                    })
+                })
+                .then(response => response.json())
+                .then(() => {
+                    alert("Employee updated!");
+                    fetchEmployees();
+                });
+        }
+    </script>
+</head>
+
+<body onload="fetchEmployees()">
+    <div class="container">
+        <h1>Employee Management System</h1>
+
+        <h2>Add Employee</h2>
+        <input type="text" id="name" placeholder="Name">
+        <input type="number" id="age" placeholder="Age">
+        <input type="text" id="department" placeholder="Department">
+        <button onclick="addEmployee()">Add</button>
+
+        <h2>Delete Employee</h2>
+        <input type="number" id="deleteId" placeholder="Enter ID">
+        <button onclick="deleteEmployee()">Delete</button>
+
+        <h2>Update Employee</h2>
+        <input type="number" id="updateId" placeholder="Employee ID">
+        <input type="text" id="updateName" placeholder="New Name">
+        <input type="number" id="updateAge" placeholder="New Age">
+        <input type="text" id="updateDepartment" placeholder="New Department">
+        <button onclick="updateEmployee()">Update</button>
+
+        <!-- <h2>All Employees</h2>
+        <table border="1" id="employeeTable"></table> -->
+    </div>
+</body>
+
+</html>
